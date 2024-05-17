@@ -40,7 +40,7 @@ uint8_t scan_keypad()
 uint8_t get_keypad(int row, int col)
 {
 	uint8_t keypad_char[4][4] = {
-		{' ', '0', '=', '+'},
+		{'b', '0', '=', '+'},
 		{'7', '8', '9', '*'},
 		{'4', '5', '6', '-'},
 		{'1', '2', '3', '/'}

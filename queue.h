@@ -18,6 +18,6 @@ int queue_empty();
 uint8_t read_queue();
 void queue_init();
 void insert_queue(uint8_t value);
-
+void backspace_queue();
 
 #endif /* QUEUE_H_ */

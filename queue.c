@@ -38,8 +38,8 @@ uint8_t read_queue()
 		printf("Queue is empty !!!\n");
 	else
 	{
-		front = (front+1) % QUEUE_MAX;
-		return (queue[front]);
+		//front = (front+1) % QUEUE_MAX;
+		return (queue[rear]);
 	}
 }
 
@@ -60,5 +60,14 @@ void insert_queue(uint8_t value)
 	{
 		rear = (rear+1) % QUEUE_MAX;
 		queue[rear]=value;
+	}
+}
+
+void backspace_queue() {
+	if (queue_empty()) {
+		printf("Queue is empty, cannot remove last item!\n");
+	} else {
+		queue[rear--] = 0;
+		queue[rear--] = 0;
 	}
 }

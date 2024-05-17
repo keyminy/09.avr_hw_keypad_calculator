@@ -34,6 +34,7 @@ volatile uint32_t ultrasonic_trigger_timer=0;   // trigger를 동작시키는 �
 // ISR 루틴은 가능한 짧게 구현 한다.
 
 uint8_t keydata=0; 
+int key_flag = 0;
 
 ISR(TIMER0_OVF_vect)
 {
@@ -45,7 +46,7 @@ ISR(TIMER0_OVF_vect)
 		if ( (keydata=scan_keypad()) )
 		{
 			insert_queue(keydata);
-	
+			key_flag = 1;
 		}
 		
 	}
@@ -71,16 +72,17 @@ int main(void)
 	I2C_LCD_init();
 	sei();    // 전역적으로 인터럽트 허용
 
-	int row_cnt = 0, col_cnt = 0;
 	char string[100] = "";
 	int string_cnt = 0;
 	
     while (1) 
     {
 		if(get_button(BUTTON1PIN,BUTTON1)){
+			key_flag = 1;
 			insert_queue('(');
 		}else if(get_button(BUTTON2PIN, BUTTON2))
 		{
+			key_flag = 1;
 			insert_queue(')');
 		}else if(get_button(BUTTON3PIN,BUTTON3)){
 			I2C_LCD_clear();
@@ -93,15 +95,30 @@ int main(void)
 			for(int i=0; i< QUEUE_MAX; i++){
 				queue[i] = 0;
 			}
+			printf("clear\n");
 		}
-		if (queue_empty() != TRUE)
+		//if (queue_empty() != TRUE)
+		if (key_flag == 1)
 		{
+			key_flag = 0;
 			readkey=read_queue();
 printf("readkey:%c\n", readkey);
 
 			//LCD 출력 함수 호출
 			string[string_cnt] = readkey;
+			string_cnt++;
 printf("string: %s\n", string);
+printf("string_cnt: %d\n", string_cnt);
+
+			//backspace 기능
+			if(readkey == 'b'){
+				printf("backspace\n");
+				backspace_queue();//rear감소
+				string[--string_cnt] = '\0';
+				string[--string_cnt] = '\0';
+				
+				I2C_LCD_clear();
+			}
 
 			if(strlen(string) < 16){
 				I2C_LCD_write_string_XY(0, 0, string);
@@ -109,7 +126,7 @@ printf("string: %s\n", string);
 				I2C_LCD_write_string_XY(0, 0, string);
 				I2C_LCD_write_string_XY(1, 0, &string[16]);
 			}
-			string_cnt++;
+
 			
 			if(readkey == '='){
 				//queue(uint8_t) -> postfix(char)
@@ -134,7 +151,7 @@ printf("result string: %s\n", string);
 				break;
 			}
 		}
-    }
+	}
 	
 	
 	
