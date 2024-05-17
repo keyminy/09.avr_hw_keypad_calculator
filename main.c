@@ -112,12 +112,17 @@ printf("string_cnt: %d\n", string_cnt);
 
 			//backspace 기능
 			if(readkey == 'b'){
-				printf("backspace\n");
-				backspace_queue();//rear감소
-				string[--string_cnt] = '\0';
-				string[--string_cnt] = '\0';
-				
-				I2C_LCD_clear();
+				if(string_cnt >= 2){
+					printf("backspace\n");
+					backspace_queue();//rear감소
+					string[--string_cnt] = '\0';
+					string[--string_cnt] = '\0';
+					I2C_LCD_clear();
+				}else{
+					printf("you can't delete\n");
+					string[--string_cnt] = '\0';
+					continue;
+				}
 			}
 
 			if(strlen(string) < 16){
