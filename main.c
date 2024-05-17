@@ -82,49 +82,56 @@ int main(void)
 		}else if(get_button(BUTTON2PIN, BUTTON2))
 		{
 			insert_queue(')');
-		}else if(get_button(BUTTON3,BUTTON3)){
+		}else if(get_button(BUTTON3PIN,BUTTON3)){
 			I2C_LCD_clear();
 			queue_init();
-			strcpy(string,'\0');
+			int len = strlen(string);
 			string_cnt = 0;
-			printf("clear\n");
+			for(int i=0; i < len; i++){
+				string[i] = '\0';
+			}
+			for(int i=0; i< QUEUE_MAX; i++){
+				queue[i] = 0;
+			}
 		}
-		
 		if (queue_empty() != TRUE)
 		{
 			readkey=read_queue();
 printf("readkey:%c\n", readkey);
-			
+
 			//LCD 출력 함수 호출
 			string[string_cnt] = readkey;
-printf("string : %s\n",string);
-			
+printf("string: %s\n", string);
+
 			if(strlen(string) < 16){
-				I2C_LCD_write_string_XY(0,0,string);
+				I2C_LCD_write_string_XY(0, 0, string);
 			}else{
-				I2C_LCD_write_string_XY(0,0,string); //0~15인덱스
-				//16번째 인덱스부터
-				I2C_LCD_write_string_XY(1,0,&string[16]);
+				I2C_LCD_write_string_XY(0, 0, string);
+				I2C_LCD_write_string_XY(1, 0, &string[16]);
 			}
 			string_cnt++;
 			
 			if(readkey == '='){
 				//queue(uint8_t) -> postfix(char)
+				
 				infix_to_postfix((char*) queue, postfix);
-printf("result: %d\n", (int)eval(postfix));
+printf("result: %.4lf\n", eval(postfix));
+
 				//LCD 출력
+				//string[string_cnt] = (char)eval(postfix);
+				//double->string
 				char s1[10] = "";
-				sprintf(s1,"%d",(int)eval(postfix));
-				strcat(string,s1); // 연산결과 string에 이어쓰기
+				sprintf(s1, "%.4lf", eval(postfix));
+				strcat(string, s1);
 printf("result string: %s\n", string);
 				
 				if(strlen(string) < 16){
-					I2C_LCD_write_string_XY(0,0,string);
+					I2C_LCD_write_string_XY(0, 0, string);
 				}else{
-					I2C_LCD_write_string_XY(0,0,string); //0~15인덱스
-					//16번째 인덱스부터
-					I2C_LCD_write_string_XY(1,0,&string[16]);
-				}
+					I2C_LCD_write_string_XY(0, 0, string);
+					I2C_LCD_write_string_XY(1, 0, &string[16]);
+				}			
+				break;
 			}
 		}
     }
